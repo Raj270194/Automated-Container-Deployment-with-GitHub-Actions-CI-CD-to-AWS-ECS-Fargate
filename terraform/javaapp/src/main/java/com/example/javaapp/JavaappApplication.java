@@ -14,7 +14,7 @@ public class JavaappApplication {
 
     @GetMapping("/")
     public String home() {
-        return "🔵 Up The Chels!  Java ECS App Deployed via Terraform & GitHub Actions (version 2)";
+        return "🔵 Up The Chels!  Java ECS App Deployed via Terraform & GitHub Actions (I Love you Jesus!)";
     }
 }
 

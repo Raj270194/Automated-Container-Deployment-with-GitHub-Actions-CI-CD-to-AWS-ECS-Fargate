@@ -1,0 +1,63 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+target/
+build/
+out/
+
+# Maven
+.mvn/
+!**/src/main/**/mvnw
+!**/src/main/**/mvnw.cmd
+!**/mvnw
+!**/mvnw.cmd
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# IntelliJ / Eclipse / VSCode IDE files
+.idea/
+*.iws
+*.ipr
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+
+# Logs
+*.log
+logs/
+spring.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+terraform.tfvars.backup
+override.tf
+override.tf.json
+
+# Docker
+*.dockerfile
+**/Dockerfile~
+docker-compose.override.yml
+.env
+
+# AWS CLI credentials (Never push secrets!)
+.aws/
+*.pem
+
+# Other
+node_modules/
+

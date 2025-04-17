@@ -150,7 +150,7 @@ The command should generate a success message, confirming that it is valid, as d
 terraform plan
 ```
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/427a3d54558ac307b3e3ca46a1201ddf0616fc4c/screenshots/Screenshot%202025-04-16%20195343.png)
 
 The list of changes that Terraform is anticipated to apply to the infrastructure resources should be displayed. The “+” sign indicates what will be added, while the “-” sign indicates what will be removed.
 

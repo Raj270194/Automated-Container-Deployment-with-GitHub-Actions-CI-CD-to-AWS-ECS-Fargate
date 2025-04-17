@@ -257,7 +257,7 @@ You can also check CloudWatch for logs under `/ecs/your-service-name.`
 
 Verify ECS Service is running the new task.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/2f59b329ceda901dda91ee4f87faa9f0b5db935f/screenshots/Screenshot%202025-04-16%20210751.png)
 
 ## Future Enhancements
 1.Add automated rollback using ECS deployment circuit breakers

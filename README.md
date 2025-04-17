@@ -249,11 +249,8 @@ Go to GitHub → Actions and check the pipeline logs.
 
 Access the application via the ALB DNS URL (output by Terraform)
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/97113de8b61851cfb4540cb4d1cfeef56decbf05/screenshots/Screenshot%202025-04-16%20210915.png)
 
-You can also check CloudWatch for logs under `/ecs/your-service-name.`
-
-![image_alt]()
 
 Verify ECS Service is running the new task.
 

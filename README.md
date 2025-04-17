@@ -175,7 +175,7 @@ The process should now conclude with a message indicating “Apply complete”, 
 
 3.2.In the AWS Management Console, head to the EC2 dashboard and verify that the ECS load Balancer was successfull created.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/6b9cfa7b660e6d3f8221c8002e705135f09dc480/screenshots/Screenshot%202025-04-16%20200219.png)
 
 Also, navigate to the left pane, scroll down and select Target groups. Select the created Target group, scroll down, then verify that the instances Health status is healthy, as shown below.
 

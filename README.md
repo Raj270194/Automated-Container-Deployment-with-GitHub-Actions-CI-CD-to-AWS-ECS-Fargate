@@ -158,6 +158,131 @@ The list of changes that Terraform is anticipated to apply to the infrastructure
 ```language
 terraform apply
 ```
+Terraform will initiate the process of applying all the changes to the infrastructure. Kindly wait for a few seconds for the deployment process to complete.
+
+![image_alt]()
+
+## Success
+The process should now conclude with a message indicating “Apply complete”, stating the total number of added, modified, and destroyed resources, accompanied by several resources. Please copy and save the ALB’s DNS URL, which will be required to access the web page from the browser.
+
+![image_alt]()
+
+## Step 3: Verify creation of our resources
+3.1.In the AWS Management Console, head to the ECS Console and verify that there are two Tasks running as show below
+
+![image_alt]()
+
+3.2.In the AWS Management Console, head to the EC2 dashboard and verify that the ECS load Balancer was successfull created.
+
+![image_alt]()
+
+Also, navigate to the left pane, scroll down and select Target groups. Select the created Target group, scroll down, then verify that the instances Health status is healthy, as shown below.
+
+![image_alt]()
+
+Also, navigate to Cloudwatch under group logs check if there is any logs for our java application.
+
+![image_alt]()
+
+
+## Step 4:Verify the reachability to the website using its URL in browser
+4.1.Open up your desired browser and paste the ALB’s DNS URL in your browser.
+
+4.2.Note — Make sure to use the “http://” protocol and not https:// to reach the ALB.
+
+![image_alt]()
+
+
+## Step 5: Testing the CI/CD System
+5.1.Every time you push changes to the master branch:
+
+5.2.GitHub Actions triggers the workflow.
+
+5.3.Builds a new Docker image from the updated code.
+
+5.4.Pushes the image to AWS ECR.
+
+5.5.Deploys a new task to ECS, replacing the old one.
+
+5.6.Manage `Secrets` in GitHub:
+
+1.Environment Variables:
+
+The envsection within the steps that require AWS credentials pulls the values from the secrets stored in the GitHub repository.
+
+2.Navigate to Your Repository on GitHub
+
+3.Add `Secrets Settings` > `Secrets and variables` > `Actions`.
+
+4.Add the following secrets:
+
+![image_alt]()
+
+5.7.Push a Code Change to Trigger Deployment on your app homepage.
+```language
+
+git add .
+
+git commit -m "Updated java-app  Homepage"
+
+git push origin master
+```
+GitHub Actions will trigger:
+
+1.Checkout code
+
+2.Install dependencies & run tests
+
+3.Build Docker image
+
+4.Push to ECR
+
+5.pdate ECS Task Definition
+
+6.Deploy to Fargate
+
+Go to GitHub → Actions and check the pipeline logs.
+
+![image_alt]()
+
+
+Access the application via the ALB DNS URL (output by Terraform)
+
+![image_alt]()
+
+You can also check CloudWatch for logs under `/ecs/your-service-name.`
+
+![image_alt]()
+
+Verify ECS Service is running the new task.
+
+![image_alt]()
+
+## Future Enhancements
+1.Add automated rollback using ECS deployment circuit breakers
+
+2.Use AWS Secrets Manager for secret storage
+
+3.Set up custom domain with Route53 + SSL
+
+4.Integrate monitoring with Prometheus and Grafana
+
+5.Enable blue/green deployments using CodeDeploy + ECS
+
+## What I've Learned
+1.Practical understanding of ECS Fargate, ECR, and VPC networking
+
+2.Building and securing CI/CD pipelines with GitHub Actions
+
+3.How to structure Terraform modules for scalable infra
+
+4.The importance of automation and repeatability in modern DevOps
+
+5.Real-world cloud architecture patterns and best practices
+
+
+
+
 
 
 

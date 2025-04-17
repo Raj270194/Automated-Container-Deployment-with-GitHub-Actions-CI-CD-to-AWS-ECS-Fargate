@@ -220,7 +220,6 @@ The env section within the steps that require AWS credentials pulls the values f
 
 5.7.Push a Code Change to Trigger Deployment on your app homepage.
 ```language
-
 git add .
 
 git commit -m "Updated java-app  Homepage"

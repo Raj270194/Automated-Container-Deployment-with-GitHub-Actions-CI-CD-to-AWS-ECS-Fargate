@@ -179,7 +179,7 @@ The process should now conclude with a message indicating “Apply complete”, 
 
 Also, navigate to the left pane, scroll down and select Target groups. Select the created Target group, scroll down, then verify that the instances Health status is healthy, as shown below.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/92e1563816801e040a6e621176dafabd8dc3bf2a/screenshots/Screenshot%202025-04-16%20200316.png)
 
 Also, navigate to Cloudwatch under group logs check if there is any logs for our java application.
 

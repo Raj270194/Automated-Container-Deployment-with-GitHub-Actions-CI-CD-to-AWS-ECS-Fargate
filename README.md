@@ -218,7 +218,7 @@ The env section within the steps that require AWS credentials pulls the values f
 
 4.Add the following secrets:
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/2824a53a01705b02dae127faa90be1967b9e4606/screenshots/Screenshot%202025-03-13%20162644.png)
 
 5.7.Push a Code Change to Trigger Deployment on your app homepage.
 ```language

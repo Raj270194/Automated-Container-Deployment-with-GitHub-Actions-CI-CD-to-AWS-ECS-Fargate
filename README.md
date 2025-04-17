@@ -143,7 +143,7 @@ terraform validate
 ```
 The command should generate a success message, confirming that it is valid, as demonstrated below.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/e5ae981933999e54cc23c0c92202c2bad88d9f0a/screenshots/Screenshot%202025-04-16%20194828.png)
 
 2.4.Let’s now execute the following command to generate a list of all the modifications that Terraform will apply.
 ```language

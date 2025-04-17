@@ -244,7 +244,7 @@ GitHub Actions will trigger:
 
 Go to GitHub → Actions and check the pipeline logs.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/9c3e6ef7d387d23b1a532b8a4ff842ef8ecb9784/screenshots/Screenshot%202025-04-16%20211202.png)
 
 
 Access the application via the ALB DNS URL (output by Terraform)

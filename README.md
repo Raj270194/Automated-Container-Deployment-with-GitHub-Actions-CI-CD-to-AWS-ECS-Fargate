@@ -160,7 +160,7 @@ terraform apply
 ```
 Terraform will initiate the process of applying all the changes to the infrastructure. Kindly wait for a few seconds for the deployment process to complete.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/e40fc3ec82c5d2244cf8638dcbdbb0dde2270ba1/screenshots/Screenshot%202025-04-16%20195447.png)
 
 ## Success
 The process should now conclude with a message indicating “Apply complete”, stating the total number of added, modified, and destroyed resources, accompanied by several resources. Please copy and save the ALB’s DNS URL, which will be required to access the web page from the browser.

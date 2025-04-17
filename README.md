@@ -135,7 +135,7 @@ terraform init
 ```
 Upon completion of the initialization process, a successful prompt will be displayed, as shown
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/6e777fc11759c41c01cb5e268b8cd58b2bb50de2/screenshots/Screenshot%202025-04-16%20194610.png)
 
 2.3.Next, let’s ensure that our code does not contain any syntax errors by running the following command
 ```language

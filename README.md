@@ -115,7 +115,8 @@ docker tag my-node-app:latest <ECR_URI>:latest
 
 docker push <ECR_URI>:latest
 ```
-![image_alt]()
+
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/6748470f21a3d9db096b803909dd409b4ce1b868/screenshots/Screenshot%202025-04-16%20203239.png)
 
 ## Step 2 : Run Terraform workflow to initialize, validate, plan then apply
 2.1.Terraform will provision:

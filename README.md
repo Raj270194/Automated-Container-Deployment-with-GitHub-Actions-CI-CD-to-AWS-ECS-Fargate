@@ -191,7 +191,7 @@ Also, navigate to Cloudwatch under group logs check if there is any logs for our
 
 4.2.Note — Make sure to use the “http://” protocol and not https:// to reach the ALB.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/9b470c4fce78afc2e99b3adccb23213e1759fa7a/screenshots/Screenshot%202025-04-16%20200414.png)
 
 
 ## Step 5: Testing the CI/CD System

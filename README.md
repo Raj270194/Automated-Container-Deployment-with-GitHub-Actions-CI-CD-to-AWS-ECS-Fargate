@@ -208,7 +208,7 @@ Also, navigate to Cloudwatch under group logs check if there is any logs for our
 
 1.Environment Variables:
 
-The envsection within the steps that require AWS credentials pulls the values from the secrets stored in the GitHub repository.
+The env section within the steps that require AWS credentials pulls the values from the secrets stored in the GitHub repository.
 
 2.Navigate to Your Repository on GitHub
 

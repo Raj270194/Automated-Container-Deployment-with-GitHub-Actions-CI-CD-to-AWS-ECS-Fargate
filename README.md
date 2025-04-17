@@ -183,7 +183,7 @@ Also, navigate to the left pane, scroll down and select Target groups. Select th
 
 Also, navigate to Cloudwatch under group logs check if there is any logs for our java application.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/d0e6037341115165af9a54f3df6f5a78035d4a77/screenshots/Screenshot%202025-04-16%20202507.png)
 
 
 ## Step 4:Verify the reachability to the website using its URL in browser

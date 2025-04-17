@@ -165,7 +165,7 @@ Terraform will initiate the process of applying all the changes to the infrastru
 ## Success
 The process should now conclude with a message indicating “Apply complete”, stating the total number of added, modified, and destroyed resources, accompanied by several resources. Please copy and save the ALB’s DNS URL, which will be required to access the web page from the browser.
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/54e67d61feeb10b6ffaeb4599ff4bc40d4289f95/screenshots/Screenshot%202025-04-16%20195904.png)
 
 ## Step 3: Verify creation of our resources
 3.1.In the AWS Management Console, head to the ECS Console and verify that there are two Tasks running as show below

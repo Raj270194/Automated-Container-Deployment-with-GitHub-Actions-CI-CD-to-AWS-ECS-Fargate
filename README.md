@@ -171,7 +171,7 @@ The process should now conclude with a message indicating “Apply complete”, 
 ## Step 3: Verify creation of our resources
 3.1.In the AWS Management Console, head to the ECS Console and verify that there are two Tasks running as show below
 
-![image_alt]()
+![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/f845cce672b41027797d3b5d5fa92e7626124c3e/screenshots/Screenshot%202025-04-16%20200048.png)
 
 3.2.In the AWS Management Console, head to the EC2 dashboard and verify that the ECS load Balancer was successfull created.
 

@@ -1,6 +1,6 @@
 ## Automated Container Deployment with GitHub Actions CI/CD to AWS ECS Fargate 
 
-![image_alt](https://github.com/Tatenda-Prince/Automated-Container-Deployment-with-GitHub-Actions-CI-CD-to-AWS-ECS-Fargate/blob/12d8749af8f809b476fe16ec59f8f4d041eceb47/screenshots/Screenshot%202025-04-17%20182657.png)
+![image_alt]()
 
 ## Background
 As part of my cloud and DevOps engineering journey, I wanted to build a real-world CI/CD pipeline that showcases my ability to:

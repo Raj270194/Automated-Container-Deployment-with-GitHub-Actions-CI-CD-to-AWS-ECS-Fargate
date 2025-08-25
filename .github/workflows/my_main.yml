@@ -52,7 +52,7 @@ jobs:
 
           jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)' task-def.json > new-task-def.json
 
-          jq --arg IMAGE_URI "${{ secrets.ECR_URI }}:$IMAGE_TAG" '.containerDefinitions[0].image = $IMAGE_URI' new-task-def.json > updated-task-def.json
+          jq --arg IMAGE_URI "${{ secjq --arg IMAGE_URI "***:$IMAGE_TAG" '.containerDefinitions[0].image = $IMAGE_URI' new-task-def.json > updated-task-def.jsonrets.ECR_URI }}:$IMAGE_TAG" '.containerDefinitions[0].image = $IMAGE_URI' new-task-def.json > updated-task-def.json
 
           NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
             --cli-input-json file://updated-task-def.json \

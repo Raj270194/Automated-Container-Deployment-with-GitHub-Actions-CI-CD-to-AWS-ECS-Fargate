@@ -36,7 +36,7 @@ jobs:
         env:
           ECR_URI: ${{ secrets.ECR_URI }}
         run: |
-          IMAGE_TAG=""latest"
+          IMAGE_TAG="latest"
           docker build -t $ECR_URI:$IMAGE_TAG -f terraform/javaapp/Dockerfile terraform/javaapp
           docker push $ECR_URI:$IMAGE_TAG
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV

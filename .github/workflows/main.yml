@@ -9,6 +9,8 @@ jobs:
   deploy:
     name: Build, Push, and Deploy to ECS
     runs-on: ubuntu-latest
+    env:
+      AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE: 1
 
     steps:
       - name: 📥 Checkout code

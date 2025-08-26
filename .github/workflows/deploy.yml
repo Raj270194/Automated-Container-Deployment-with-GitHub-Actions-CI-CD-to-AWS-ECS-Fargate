@@ -1,98 +1,83 @@
-name: 🚀 Deploy to AWS ECS (Java App)
+name: Deploy Java App to ECS via CodeDeploy
 
 on:
   push:
     branches:
       - main
 
-env:
-  AWS_REGION: us-east-1
-  IMAGE_TAG: v2
-  TASK_FAMILY: java-ecs-task
-  ECS_CLUSTER_NAME: java-app-cluster
-  ECS_SERVICE_NAME: java-app-service
-  CONTAINER_NAME: java-app
-  CODEDEPLOY_APP_NAME: JavaAppCodeDeploy
-  CODEDEPLOY_GROUP_NAME: JavaAppDeploymentGroup
-  APP_MESSAGE: "🔵 Up The Chels! Java ECS App Deployed via Terraform & GitHub Actions"
-
 jobs:
   deploy:
-    name: Build, Push, and Deploy to ECS via CodeDeploy
+    name: Green Deployment to ECS
     runs-on: ubuntu-latest
 
+    env:
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+      CODEDEPLOY_APP_NAME: JavaAppCodeDeploy
+      CODEDEPLOY_GROUP_NAME: JavaAppDeploymentGroup
+      ECS_CLUSTER_NAME: java-app-cluster
+      ECS_SERVICE_NAME: java-app-service
+      TASK_FAMILY: java-ecs-task
+      CONTAINER_NAME: java-app
+      IMAGE_TAG: v2
+      APP_MESSAGE: 🔵 Up The Chels! Java ECS App Deployed via Terraform & GitHub Actions
+
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 🔐 Set up AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: 🔐 Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: 🛠️ Build, Tag, and Push Docker Image to ECR
-        env:
-          ECR_URI: ${{ secrets.ECR_URI }}
+      - name: Register new ECS task definition
+        id: register-task
         run: |
-          docker build -t $ECR_URI:$IMAGE_TAG -f terraform/javaapp/Dockerfile terraform/javaapp
-          docker push $ECR_URI:$IMAGE_TAG
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "ECR_URI=$ECR_URI" >> $GITHUB_ENV
-
-      - name: 🧩 Register new ECS Task Definition revision
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition $TASK_FAMILY \
-            --query taskDefinition > task-def.json
-
-          jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)' task-def.json > new-task-def.json
-
-          jq --arg IMAGE_URI "$ECR_URI:$IMAGE_TAG" \
-             --arg APP_MESSAGE "$APP_MESSAGE" \
-            '.containerDefinitions[0].image = $IMAGE_URI |
-             .containerDefinitions[0].environment = [{"name":"APP_MESSAGE","value":$APP_MESSAGE}]' \
-            new-task-def.json > updated-task-def.json
-
-          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
-            --cli-input-json file://updated-task-def.json \
+          NEW_TASK_DEF=$(aws ecs register-task-definition \
+            --family $TASK_FAMILY \
+            --container-definitions file://container-definitions.json \
             --query 'taskDefinition.taskDefinitionArn' \
             --output text)
+          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF" >> $GITHUB_ENV
 
-          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
-
-      - name: 📦 Create CodeDeploy AppSpec revision file
+      - name: Create CodeDeploy revision.json
         run: |
-          cat > revision.json <<EOF
-          {
-            "revisionType": "AppSpecContent",
-            "appSpecContent": {
-              "content": "{\\\"version\\\": 1, \\\"Resources\\\": [{\\\"TargetService\\\": {\\\"Type\\\": \\\"AWS::ECS::Service\\\", \\\"Properties\\\": {\\\"TaskDefinition\\\": \\\"$NEW_TASK_DEF_ARN\\\", \\\"LoadBalancerInfo\\\": {\\\"ContainerName\\\": \\\"$CONTAINER_NAME\\\", \\\"ContainerPort\\\": 8080}}}}]}",
-              "sha256": ""
-            }
-          }
-          EOF
+          jq -n \
+            --arg taskDefArn "$NEW_TASK_DEF_ARN" \
+            --arg containerName "$CONTAINER_NAME" \
+            '{
+              revisionType: "AppSpecContent",
+              appSpecContent: {
+                content: (
+                  {
+                    version: 1,
+                    Resources: [
+                      {
+                        TargetService: {
+                          Type: "AWS::ECS::Service",
+                          Properties: {
+                            TaskDefinition: $taskDefArn,
+                            LoadBalancerInfo: {
+                              ContainerName: $containerName,
+                              ContainerPort: 8080
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  } | @json
+                ),
+                sha256: ""
+              }
+            }' > revision.json
 
-      - name: 🚀 Trigger CodeDeploy Deployment
+      - name: Create CodeDeploy deployment
         run: |
           aws deploy create-deployment \
             --application-name $CODEDEPLOY_APP_NAME \
             --deployment-group-name $CODEDEPLOY_GROUP_NAME \
             --revision file://revision.json \
-            --description "Green deployment with updated message"
-
-      - name: ⏳ Wait for deployment to complete
-        run: |
-          DEPLOYMENT_ID=$(aws deploy list-deployments \
-            --application-name $CODEDEPLOY_APP_NAME \
-            --deployment-group-name $CODEDEPLOY_GROUP_NAME \
-            --query "deployments[0]" \
-            --output text)
-
-          aws deploy wait deployment-successful \
-            --deployment-id $DEPLOYMENT_ID
+            --description "$APP_MESSAGE"

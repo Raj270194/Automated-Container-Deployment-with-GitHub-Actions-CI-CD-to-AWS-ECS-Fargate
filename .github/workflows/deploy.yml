@@ -13,8 +13,8 @@ env:
   ECS_CLUSTER_NAME: java-app-cluster
   ECS_SERVICE_NAME: java-app-service
   CONTAINER_NAME: java-app
-  CODEDEPLOY_APP_NAME: JavaAppCodeDeploy
-  CODEDEPLOY_GROUP_NAME: JavaAppDeploymentGroup
+  CODEDEPLOY_APP_NAME: java-app-codedeploy
+  CODEDEPLOY_GROUP_NAME: java-app-deployment-group
   APP_MESSAGE: "🔵 Up The Chels! Java ECS App Deployed via Terraform & GitHub Actions"
 
 jobs:
@@ -129,4 +129,5 @@ jobs:
 
           aws deploy wait deployment-successful \
             --deployment-id $DEPLOYMENT_ID
+
 

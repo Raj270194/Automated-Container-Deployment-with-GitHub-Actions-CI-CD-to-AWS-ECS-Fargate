@@ -14,7 +14,7 @@ env:
   CONTAINER_NAME: java-app
   CODEDEPLOY_APP_NAME: JavaAppCodeDeploy
   CODEDEPLOY_GROUP_NAME: JavaAppDeploymentGroup
-  APP_MESSAGE: "🔵 Up The Chels! Java ECS App Deployed via Terraform & GitHub Actions" # updated message for green deployment
+  APP_MESSAGE: "🔵 Up The Chels! Java ECS App Deployed via Terraform & GitHub Actions"
 
 jobs:
   deploy:
@@ -68,30 +68,11 @@ jobs:
 
       - name: 📦 Create CodeDeploy AppSpec revision file
         run: |
-          cat <<EOF > revision.json
+          cat > revision.json <<EOF
           {
             "revisionType": "AppSpecContent",
             "appSpecContent": {
-              "content": "$(cat <<EOC
-              {
-                "version": 1,
-                "Resources": [
-                  {
-                    "TargetService": {
-                      "Type": "AWS::ECS::Service",
-                      "Properties": {
-                        "TaskDefinition": "$NEW_TASK_DEF_ARN",
-                        "LoadBalancerInfo": {
-                          "ContainerName": "$CONTAINER_NAME",
-                          "ContainerPort": 8080
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-              EOC
-              )",
+              "content": "{\\\"version\\\": 1, \\\"Resources\\\": [{\\\"TargetService\\\": {\\\"Type\\\": \\\"AWS::ECS::Service\\\", \\\"Properties\\\": {\\\"TaskDefinition\\\": \\\"$NEW_TASK_DEF_ARN\\\", \\\"LoadBalancerInfo\\\": {\\\"ContainerName\\\": \\\"$CONTAINER_NAME\\\", \\\"ContainerPort\\\": 8080}}}}]}",
               "sha256": ""
             }
           }

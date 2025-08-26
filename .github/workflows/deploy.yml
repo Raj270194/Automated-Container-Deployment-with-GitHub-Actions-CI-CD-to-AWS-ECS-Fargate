@@ -7,14 +7,18 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  IMAGE_TAG: latest
+  IMAGE_TAG: v2
   TASK_FAMILY: java-ecs-task
   ECS_CLUSTER_NAME: java-app-cluster
   ECS_SERVICE_NAME: java-app-service
+  CONTAINER_NAME: java-app
+  CODEDEPLOY_APP_NAME: JavaAppCodeDeploy
+  CODEDEPLOY_GROUP_NAME: JavaAppDeploymentGroup
+  APP_MESSAGE: "🔵 Up The Chels! Java ECS App Deployed via Terraform & GitHub Actions" # updated message for green deployment
 
 jobs:
   deploy:
-    name: Build, Push, and Deploy to ECS
+    name: Build, Push, and Deploy to ECS via CodeDeploy
     runs-on: ubuntu-latest
 
     steps:
@@ -50,7 +54,9 @@ jobs:
           jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)' task-def.json > new-task-def.json
 
           jq --arg IMAGE_URI "$ECR_URI:$IMAGE_TAG" \
-            '.containerDefinitions[0].image = $IMAGE_URI' \
+             --arg APP_MESSAGE "$APP_MESSAGE" \
+            '.containerDefinitions[0].image = $IMAGE_URI |
+             .containerDefinitions[0].environment = [{"name":"APP_MESSAGE","value":$APP_MESSAGE}]' \
             new-task-def.json > updated-task-def.json
 
           NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
@@ -60,10 +66,52 @@ jobs:
 
           echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
 
-      - name: 🚀 Deploy updated Task Definition to ECS
+      - name: 📦 Create CodeDeploy AppSpec revision file
         run: |
-          aws ecs update-service \
-            --cluster $ECS_CLUSTER_NAME \
-            --service $ECS_SERVICE_NAME \
-            --task-definition $NEW_TASK_DEF_ARN
+          cat <<EOF > revision.json
+          {
+            "revisionType": "AppSpecContent",
+            "appSpecContent": {
+              "content": "$(cat <<EOC
+              {
+                "version": 1,
+                "Resources": [
+                  {
+                    "TargetService": {
+                      "Type": "AWS::ECS::Service",
+                      "Properties": {
+                        "TaskDefinition": "$NEW_TASK_DEF_ARN",
+                        "LoadBalancerInfo": {
+                          "ContainerName": "$CONTAINER_NAME",
+                          "ContainerPort": 8080
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+              EOC
+              )",
+              "sha256": ""
+            }
+          }
+          EOF
 
+      - name: 🚀 Trigger CodeDeploy Deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name $CODEDEPLOY_APP_NAME \
+            --deployment-group-name $CODEDEPLOY_GROUP_NAME \
+            --revision file://revision.json \
+            --description "Green deployment with updated message"
+
+      - name: ⏳ Wait for deployment to complete
+        run: |
+          DEPLOYMENT_ID=$(aws deploy list-deployments \
+            --application-name $CODEDEPLOY_APP_NAME \
+            --deployment-group-name $CODEDEPLOY_GROUP_NAME \
+            --query "deployments[0]" \
+            --output text)
+
+          aws deploy wait deployment-successful \
+            --deployment-id $DEPLOYMENT_ID

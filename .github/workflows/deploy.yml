@@ -116,8 +116,9 @@ jobs:
           aws deploy create-deployment \
             --application-name $CODEDEPLOY_APP_NAME \
             --deployment-group-name $CODEDEPLOY_GROUP_NAME \
-            --revision file://revision.json \
-            --description "$APP_MESSAGE"
+            --revision revisionType=S3,s3Location={bucket=my-deployments-bucket123,key=deployment_bundle.zip,bundleType=zip} \
+            --description "$APP_MESSAGE" \
+            --region $AWS_REGION
 
       - name: ⏳ Wait for deployment to complete
         run: |
@@ -129,5 +130,6 @@ jobs:
 
           aws deploy wait deployment-successful \
             --deployment-id $DEPLOYMENT_ID
+
 
 

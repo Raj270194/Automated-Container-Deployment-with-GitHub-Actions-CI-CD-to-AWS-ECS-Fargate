@@ -1,75 +1,75 @@
-name: Deploy to AWS ECS (Java App)
+name: Deploy to ECS
 
 on:
   push:
     branches:
       - main
 
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: your-ecr-repo-name
+  ECS_CLUSTER: your-ecs-cluster-name
+  ECS_SERVICE: your-ecs-service-name
+  TASK_FAMILY: your-task-family-name
+
 jobs:
   deploy:
-    name: Build, Push, and Deploy to ECS
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: ✅ Verify Dockerfile exists
-        run: |
-          if [ ! -f terraform/javaapp/Dockerfile ]; then
-            echo "❌ Dockerfile missing!"
-            exit 1
-          fi
-
-      - name: 🔐 Set up AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: 🔐 Login to Amazon ECR
+      - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: 🛠️ Build, Tag, and Push Docker Image to ECR
-        env:
-          ECR_URI: ${{ secrets.ECR_URI }}
+      - name: Build and push Docker image
         run: |
-          IMAGE_TAG="latest"
-          docker build -t $ECR_URI:$IMAGE_TAG -f terraform/javaapp/Dockerfile terraform/javaapp
-          docker push $ECR_URI:$IMAGE_TAG
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          IMAGE_TAG=${{ github.sha }}
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-      - name: 🧩 Register new ECS Task Definition revision
-        id: task-def
-        env:
-          TASK_FAMILY: ${{ secrets.TASK_FAMILY }}
+      - name: Get current task definition
         run: |
           aws ecs describe-task-definition \
-            --task-definition $TASK_FAMILY \
-            --query taskDefinition > task-def.json
+            --task-definition ${{ env.TASK_FAMILY }} \
+            --query "taskDefinition" \
+            > task-definition.json
 
-          jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)' task-def.json > new-task-def.json
+      - name: Strip unnecessary fields
+        run: |
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            task-definition.json > new-task-def.json
 
-          jq --arg IMAGE_URI "$ECR_URI:$IMAGE_TAG" '.containerDefinitions[0].image = $IMAGE_URI' new-task-def.json > updated-task-def.json
+      - name: Update image URI
+        run: |
+          jq --arg IMAGE_URI "$IMAGE_URI" \
+            '.containerDefinitions[0].image = $IMAGE_URI' \
+            new-task-def.json > updated-task-def.json
 
+      - name: Register new task definition
+        id: register-task
+        run: |
           NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
             --cli-input-json file://updated-task-def.json \
-            --query 'taskDefinition.taskDefinitionArn' \
+            --query "taskDefinition.taskDefinitionArn" \
             --output text)
-
           echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
 
-      - name: 🚀 Deploy updated Task Definition to ECS
-        env:
-          ECS_CLUSTER_NAME: ${{ secrets.ECS_CLUSTER_NAME }}
-          ECS_SERVICE_NAME: ${{ secrets.ECS_SERVICE_NAME }}
+      - name: Update ECS service
         run: |
           aws ecs update-service \
-            --cluster $ECS_CLUSTER_NAME \
-            --service $ECS_SERVICE_NAME \
-            --task-definition $NEW_TASK_DEF_ARN
-
-
-
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition ${{ env.NEW_TASK_DEF_ARN }}

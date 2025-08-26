@@ -54,6 +54,7 @@ jobs:
               "name": "${CONTAINER_NAME}",
               "image": "${{ secrets.ECR_URI }}:${IMAGE_TAG}",
               "essential": true,
+              "memory": 512,
               "portMappings": [
                 {
                   "containerPort": 8080,
@@ -128,3 +129,4 @@ jobs:
 
           aws deploy wait deployment-successful \
             --deployment-id $DEPLOYMENT_ID
+

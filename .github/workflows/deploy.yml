@@ -1,4 +1,4 @@
-name: Deploy to ECS
+name: 🚀 Deploy to AWS ECS (Java App)
 
 on:
   push:
@@ -6,70 +6,63 @@ on:
       - main
 
 env:
-  AWS_REGION: ap-south-1
-  ECR_REPOSITORY: your-ecr-repo-name
-  ECS_CLUSTER: your-ecs-cluster-name
-  ECS_SERVICE: your-ecs-service-name
-  TASK_FAMILY: your-task-family-name
+  AWS_REGION: us-east-1
+  IMAGE_TAG: latest
+  TASK_FAMILY: java-ecs-task
+  ECS_CLUSTER_NAME: your-cluster-name
+  ECS_SERVICE_NAME: your-service-name
 
 jobs:
   deploy:
-    name: Build and Deploy
+    name: Build, Push, and Deploy to ECS
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
+      - name: 🔐 Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Log in to Amazon ECR
+      - name: 🔐 Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push Docker image
+      - name: 🛠️ Build, Tag, and Push Docker Image to ECR
+        env:
+          ECR_URI: ${{ secrets.ECR_URI }}
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
-          docker build -t $IMAGE_URI .
-          docker push $IMAGE_URI
-          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -t $ECR_URI:$IMAGE_TAG -f terraform/javaapp/Dockerfile terraform/javaapp
+          docker push $ECR_URI:$IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "ECR_URI=$ECR_URI" >> $GITHUB_ENV
 
-      - name: Get current task definition
+      - name: 🧩 Register new ECS Task Definition revision
         run: |
           aws ecs describe-task-definition \
-            --task-definition ${{ env.TASK_FAMILY }} \
-            --query "taskDefinition" \
-            > task-definition.json
+            --task-definition $TASK_FAMILY \
+            --query taskDefinition > task-def.json
 
-      - name: Strip unnecessary fields
-        run: |
-          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
-            task-definition.json > new-task-def.json
+          jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .revision, .status, .registeredAt, .registeredBy)' task-def.json > new-task-def.json
 
-      - name: Update image URI
-        run: |
-          jq --arg IMAGE_URI "$IMAGE_URI" \
+          jq --arg IMAGE_URI "$ECR_URI:$IMAGE_TAG" \
             '.containerDefinitions[0].image = $IMAGE_URI' \
             new-task-def.json > updated-task-def.json
 
-      - name: Register new task definition
-        id: register-task
-        run: |
           NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
             --cli-input-json file://updated-task-def.json \
-            --query "taskDefinition.taskDefinitionArn" \
+            --query 'taskDefinition.taskDefinitionArn' \
             --output text)
+
           echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
 
-      - name: Update ECS service
+      - name: 🚀 Deploy updated Task Definition to ECS
         run: |
           aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.ECS_SERVICE }} \
-            --task-definition ${{ env.NEW_TASK_DEF_ARN }}
+            --cluster $ECS_CLUSTER_NAME \
+            --service $ECS_SERVICE_NAME \
+            --task-definition $NEW_TASK_DEF_ARN
